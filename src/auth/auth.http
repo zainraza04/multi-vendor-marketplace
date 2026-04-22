@@ -1,0 +1,46 @@
+@baseUrl = http://localhost:3000/api
+@name = Beginner User
+@email = beginner.user@example.com
+@password = password123
+
+# Set these after register/login response
+@accessToken = eyJhbGciOiJIUzI1NisInR5cCI6IkpXVCJ9.eyJzdWIiOiIzMzMzNGM5Ni03NDk0LTRiNDctOTE4Yi0yZjI4Njg5ZWI1Y2IiLCJlbWFpbCI6ImJlZ2lubmVyLnVzZXJAZXhhbXBsZS5jb20iLCJyb2xlIjoiQ1VTVE9NRVIiLCJpYXQiOjE3NzY4NjM4NDgsImV4cCI6MTc3Njg2NzQ0OH0.DrstAabUFFMFQ-Vq9fJtY1LIQ8oyaCjy1uUXlqYlzLw
+@refreshToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzMzMzNGM5Ni03NDk0LTRiNDctOTE4Yi0yZjI4Njg5ZWI1Y2IiLCJlbWFpbCI6ImJlZ2lubmVyLnVzZXJAZXhhbXBsZS5jb20iLCJyb2xlIjoiQ1VTVE9NRVIiLCJpYXQiOjE3NzY4NjM4NDgsImV4cCI6MTc3NzQ2ODY0OH0.nMy79-Y54WysqhOgJB11AOXpCPBlIfEWEcvB8HRPH4U
+@userId = PASTE_USER_ID_HERE
+
+### Register
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+	"name": "{{name}}",
+	"email": "{{email}}",
+	"password": "{{password}}"
+}
+
+### Login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+	"email": "{{email}}",
+	"password": "{{password}}"
+}
+
+### Refresh tokens
+POST {{baseUrl}}/auth/refresh
+Content-Type: application/json
+
+{
+	"userId": "{{userId}}",
+	"refreshToken": "{{refreshToken}}"
+}
+
+### Logout (requires valid access token)
+POST {{baseUrl}}/auth/logout
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+	"refreshToken": "{{refreshToken}}"
+}
