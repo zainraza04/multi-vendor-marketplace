@@ -12,8 +12,10 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
+import { Roles } from '../common/decorators/roles.decorator';
+import { Role } from '../common/enums/roles.enum';
 
 @UseGuards(JwtAuthGuard)
 @Controller('users')
@@ -22,12 +24,14 @@ export class UsersController {
 
   @Get()
   @HttpCode(HttpStatus.OK)
+  @Roles(Role.ADMIN)
   findAll() {
     return this.usersService.findAll();
   }
 
   @Get('me')
   @HttpCode(HttpStatus.OK)
+  @Roles(Role.ADMIN, Role.VENDOR, Role.CUSTOMER)
   findMe(@CurrentUser('sub') userId: string) {
     return this.usersService.findMe(userId);
   }

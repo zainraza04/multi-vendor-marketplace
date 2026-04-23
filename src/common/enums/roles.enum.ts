@@ -1,5 +1,6 @@
-enum Role {
-  CUSTOMER,
-  VENDOR,
-  ADMIN,
+export enum Role {
+  GUEST = 'GUEST',
+  CUSTOMER = 'CUSTOMER',
+  VENDOR = 'VENDOR',
+  ADMIN = 'ADMIN',
 }

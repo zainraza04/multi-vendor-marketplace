@@ -23,16 +23,15 @@ export class AuthService {
 
     const user = await this.prisma.user.create({
       data: {
-        name: dto.name,
         email: dto.email,
         password: hashedPassword,
+        role: dto.role,
       },
     });
 
     const tokens = await this.generateTokens(user.id, user.email, user.role);
 
     return {
-      name: user.name,
       ...tokens,
     };
   }
