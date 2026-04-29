@@ -20,6 +20,9 @@ export class UsersService {
   async findAll() {
     const users = await this.prisma.user.findMany({
       orderBy: { createdAt: 'desc' },
+      include: {
+        profile: true,
+      },
     });
 
     return users.map((user) => this.sanitizeUser(user));
@@ -32,6 +35,9 @@ export class UsersService {
   async findOne(id: string) {
     const user = await this.prisma.user.findUnique({
       where: { id },
+      include: {
+        profile: true,
+      },
     });
 
     if (!user) {
@@ -44,9 +50,12 @@ export class UsersService {
   async update(id: string, updateUserDto: UpdateUserDto) {
     await this.ensureUserExists(id);
 
-    if (updateUserDto.email) {
+    const { firstName, lastName, phone, avatarUrl, ...rawUserData } =
+      updateUserDto;
+
+    if (rawUserData.email) {
       const userWithEmail = await this.prisma.user.findUnique({
-        where: { email: updateUserDto.email },
+        where: { email: rawUserData.email },
       });
 
       if (userWithEmail && userWithEmail.id !== id) {
@@ -54,19 +63,58 @@ export class UsersService {
       }
     }
 
-    const data = {
-      ...updateUserDto,
-      ...(updateUserDto.password
-        ? { password: await bcrypt.hash(updateUserDto.password, 10) }
+    const userData = {
+      ...rawUserData,
+      ...(rawUserData.password
+        ? { password: await bcrypt.hash(rawUserData.password, 10) }
         : {}),
     };
 
+    const hasProfileUpdate = [firstName, lastName, phone, avatarUrl].some(
+      (value) => value !== undefined,
+    );
+
+    if (hasProfileUpdate) {
+      await this.prisma.profile.upsert({
+        where: { userId: id },
+        update: {
+          firstName,
+          lastName,
+          phone,
+          avatarUrl,
+        },
+        create: {
+          userId: id,
+          firstName,
+          lastName,
+          phone,
+          avatarUrl,
+        },
+      });
+    }
+
     const updatedUser = await this.prisma.user.update({
       where: { id },
-      data,
+      data: userData,
+      include: {
+        profile: true,
+      },
     });
 
     return this.sanitizeUser(updatedUser);
+  }
+
+  async updateProfilePicture(userId: string, avatarUrl: string) {
+    await this.ensureUserExists(userId);
+
+    return this.prisma.profile.upsert({
+      where: { userId },
+      update: { avatarUrl },
+      create: {
+        userId,
+        avatarUrl,
+      },
+    });
   }
 
   async remove(id: string) {

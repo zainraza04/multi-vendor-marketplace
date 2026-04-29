@@ -26,6 +26,17 @@ export class AuthService {
         email: dto.email,
         password: hashedPassword,
         role: dto.role,
+        profile:
+          dto.firstName || dto.lastName || dto.phone || dto.avatarUrl
+            ? {
+                create: {
+                  firstName: dto.firstName,
+                  lastName: dto.lastName,
+                  phone: dto.phone,
+                  avatarUrl: dto.avatarUrl,
+                },
+              }
+            : undefined,
       },
     });
 

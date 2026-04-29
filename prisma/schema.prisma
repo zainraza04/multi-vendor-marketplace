@@ -46,6 +46,7 @@ model User {
   store         Store?        // only for VENDOR
   orders        Order[]       // only for CUSTOMER
   refreshTokens RefreshToken[]
+  cart          Cart?
 
   @@map("users")
 }
@@ -109,6 +110,7 @@ model Product {
   orderItems  OrderItem[]
   category    Category?     @relation(fields: [categoryId], references: [id])
   categoryId  String?
+  cartItems     CartItem[] 
 
   @@map("products")
 }
@@ -147,4 +149,29 @@ model OrderItem {
   product   Product @relation(fields: [productId], references: [id])
 
   @@map("order_items")
+}
+
+model Cart {
+  id         String     @id @default(uuid())
+  customerId String     @unique   // one cart per customer
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+
+  customer   User       @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  items      CartItem[]
+
+  @@map("carts")
+}
+
+model CartItem {
+  id        String  @id @default(uuid())
+  quantity  Int     @default(1)
+  cartId    String
+  productId String
+
+  cart      Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  product   Product @relation(fields: [productId], references: [id])
+
+  @@unique([cartId, productId])  // prevent duplicate product entries
+  @@map("cart_items")
 }

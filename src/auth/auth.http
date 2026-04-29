@@ -1,5 +1,6 @@
 @baseUrl = http://localhost:3000/api
-@name = Beginner User
+@firstName = Beginner
+@lastName = User
 @email = beginner.user@example.com
 @password = password123
 
@@ -13,7 +14,8 @@ POST {{baseUrl}}/auth/register
 Content-Type: application/json
 
 {
-	"name": "{{name}}",
+	"firstName": "{{firstName}}",
+	"lastName": "{{lastName}}",
 	"email": "{{email}}",
 	"password": "{{password}}"
 }

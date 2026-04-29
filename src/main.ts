@@ -6,9 +6,21 @@ import { RolesGuard } from './common/guards/roles.guard';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
+import { existsSync, mkdirSync } from 'fs';
+import { join } from 'path';
+import express from 'express';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const uploadsPath = join(process.cwd(), 'uploads');
+  const avatarsPath = join(uploadsPath, 'avatars');
+
+  if (!existsSync(avatarsPath)) {
+    mkdirSync(avatarsPath, { recursive: true });
+  }
+
+  app.use('/uploads', express.static(uploadsPath));
+
   app.setGlobalPrefix('api');
   app.useGlobalPipes(
     new ValidationPipe({
