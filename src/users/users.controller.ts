@@ -13,6 +13,16 @@ import {
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
+import {
+  ApiBadRequestResponse,
+  ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
@@ -21,8 +31,16 @@ import { Roles } from '../common/decorators/roles.decorator';
 import { Role } from '../common/enums/roles.enum';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersService } from './users.service';
+import {
+  DeleteUserResponseDto,
+  ProfileResponseDto,
+  UserResponseDto,
+} from '../common/swagger/user-response.dto';
+import { ErrorResponseDto } from '../common/swagger/error-response.dto';
 
 @Controller('users')
+@ApiTags('Users')
+@ApiBearerAuth('access-token')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
@@ -60,6 +78,8 @@ export class UsersController {
   @Get()
   @HttpCode(HttpStatus.OK)
   @Roles(Role.ADMIN)
+  @ApiOkResponse({ type: [UserResponseDto] })
+  @ApiUnauthorizedResponse({ type: ErrorResponseDto })
   findAll() {
     return this.usersService.findAll();
   }
@@ -67,6 +87,8 @@ export class UsersController {
   @Get('me')
   @HttpCode(HttpStatus.OK)
   @Roles(Role.ADMIN, Role.VENDOR, Role.CUSTOMER)
+  @ApiOkResponse({ type: UserResponseDto })
+  @ApiUnauthorizedResponse({ type: ErrorResponseDto })
   findMe(@CurrentUser('sub') userId: string) {
     return this.usersService.findMe(userId);
   }
@@ -74,6 +96,22 @@ export class UsersController {
   @Patch('me/profile-picture')
   @HttpCode(HttpStatus.OK)
   @Roles(Role.ADMIN, Role.VENDOR, Role.CUSTOMER)
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+      required: ['file'],
+    },
+  })
+  @ApiOkResponse({ type: ProfileResponseDto })
+  @ApiBadRequestResponse({ type: ErrorResponseDto })
+  @ApiUnauthorizedResponse({ type: ErrorResponseDto })
   @UseInterceptors(
     FileInterceptor('file', {
       storage: diskStorage({
@@ -108,12 +146,17 @@ export class UsersController {
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: UserResponseDto })
+  @ApiNotFoundResponse({ type: ErrorResponseDto })
   findOne(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.usersService.findOne(id);
   }
 
   @Patch(':id')
   @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: UserResponseDto })
+  @ApiBadRequestResponse({ type: ErrorResponseDto })
+  @ApiNotFoundResponse({ type: ErrorResponseDto })
   update(
     @Param('id', new ParseUUIDPipe()) id: string,
     @Body() updateUserDto: UpdateUserDto,
@@ -123,6 +166,8 @@ export class UsersController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: DeleteUserResponseDto })
+  @ApiNotFoundResponse({ type: ErrorResponseDto })
   remove(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.usersService.remove(id);
   }
