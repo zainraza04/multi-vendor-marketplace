@@ -11,6 +11,7 @@ import { StoreModule } from './store/store.module';
 import { ProductModule } from './product/product.module';
 import { CategoryModule } from './category/category.module';
 import { OrderModule } from './order/order.module';
+import { AiModule } from './ai/ai.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { OrderModule } from './order/order.module';
     ProductModule,
     CategoryModule,
     OrderModule,
+    AiModule,
   ],
   controllers: [],
   providers: [],

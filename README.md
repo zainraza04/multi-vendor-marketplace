@@ -80,6 +80,9 @@ The API uses the `/api` prefix. Highlights for vendor/store functionality:
   - `GET /api/orders/admin` — list all orders (admin)
   - `PATCH /api/orders/admin/:orderId/status` — update order status (admin)
 
+- **AI (public)**
+  - `POST /api/ai/chat` — basic chatbot reply (Gemini)
+
 ## Project setup
 
 ```bash
