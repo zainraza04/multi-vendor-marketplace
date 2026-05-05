@@ -8,6 +8,8 @@ import { VendorModule } from './vendor/vendor.module';
 import { AdminModule } from './admin/admin.module';
 import { CartModule } from './cart/cart.module';
 import { StoreModule } from './store/store.module';
+import { ProductModule } from './product/product.module';
+import { CategoryModule } from './category/category.module';
 
 @Module({
   imports: [
@@ -20,6 +22,8 @@ import { StoreModule } from './store/store.module';
     AdminModule,
     CartModule,
     StoreModule,
+    ProductModule,
+    CategoryModule,
   ],
   controllers: [],
   providers: [],

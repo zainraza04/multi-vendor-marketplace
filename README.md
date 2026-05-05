@@ -45,6 +45,21 @@ The API uses the `/api` prefix. Highlights for vendor/store functionality:
   - `DELETE /api/vendor/stores/:storeId` — delete store
   - `PATCH /api/vendor/deactivate` — deactivate vendor account
 
+- **Products (public + vendor)**
+  - `GET /api/products` — list products (supports `storeId`, `categoryId`, `search`)
+  - `GET /api/products/:productId` — get product by id
+  - `GET /api/products/me/list` — list vendor products
+  - `POST /api/products` — create product (vendor)
+  - `PATCH /api/products/:productId` — update product (vendor owner)
+  - `DELETE /api/products/:productId` — delete product (vendor owner)
+
+- **Categories (public + admin)**
+  - `GET /api/categories` — list categories
+  - `GET /api/categories/:categoryId` — get category by id
+  - `POST /api/categories` — create category (admin)
+  - `PATCH /api/categories/:categoryId` — update category (admin)
+  - `DELETE /api/categories/:categoryId` — delete category (admin)
+
 ## Project setup
 
 ```bash
