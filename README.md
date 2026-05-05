@@ -25,6 +25,26 @@
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
+## Marketplace APIs
+
+The API uses the `/api` prefix. Highlights for vendor/store functionality:
+
+- **Stores (public + vendor)**
+  - `GET /api/stores` — list stores
+  - `GET /api/stores/:storeId` — get store by id
+  - `POST /api/stores` — create store (vendor)
+  - `PATCH /api/stores/:storeId` — update store (vendor owner)
+  - `DELETE /api/stores/:storeId` — delete store (vendor owner)
+
+- **Vendor (vendor-only)**
+  - `GET /api/vendor/me` — vendor profile + store count
+  - `PATCH /api/vendor/profile` — update profile
+  - `GET /api/vendor/stores` — list vendor stores
+  - `POST /api/vendor/stores` — create store
+  - `PATCH /api/vendor/stores/:storeId` — update store
+  - `DELETE /api/vendor/stores/:storeId` — delete store
+  - `PATCH /api/vendor/deactivate` — deactivate vendor account
+
 ## Project setup
 
 ```bash

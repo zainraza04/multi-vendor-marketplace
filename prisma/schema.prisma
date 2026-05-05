@@ -43,7 +43,7 @@ model User {
 
   // Relations
   profile       Profile?
-  store         Store?        // only for VENDOR
+  stores        Store[]        // only for VENDOR
   orders        Order[]       // only for CUSTOMER
   refreshTokens RefreshToken[]
   cart          Cart?
@@ -84,7 +84,7 @@ model Store {
   description String?
   logoUrl     String?
   isVerified  Boolean  @default(false)
-  ownerId     String   @unique
+  ownerId     String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
