@@ -60,6 +60,26 @@ The API uses the `/api` prefix. Highlights for vendor/store functionality:
   - `PATCH /api/categories/:categoryId` — update category (admin)
   - `DELETE /api/categories/:categoryId` — delete category (admin)
 
+- **Admin (admin-only)**
+  - `GET /api/admin/summary` — platform stats
+  - `GET /api/admin/users` — list users
+  - `PATCH /api/admin/users/:userId/role` — update user role
+  - `PATCH /api/admin/users/:userId/status` — activate/deactivate user
+  - `GET /api/admin/stores` — list stores
+  - `PATCH /api/admin/stores/:storeId/verify` — verify/unverify store
+  - `GET /api/admin/products` — list products
+  - `PATCH /api/admin/products/:productId/status` — update product status
+
+- **Orders (customer + vendor + admin)**
+  - `POST /api/orders/checkout` — checkout current cart (customer)
+  - `GET /api/orders` — list customer orders
+  - `GET /api/orders/:orderId` — get customer order
+  - `PATCH /api/orders/:orderId/cancel` — cancel pending order (customer)
+  - `GET /api/orders/vendor` — list vendor orders
+  - `PATCH /api/orders/vendor/:orderId/ship` — ship order (vendor, only if all items belong to vendor)
+  - `GET /api/orders/admin` — list all orders (admin)
+  - `PATCH /api/orders/admin/:orderId/status` — update order status (admin)
+
 ## Project setup
 
 ```bash

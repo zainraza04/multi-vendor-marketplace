@@ -1,5 +1,6 @@
 import {
   IsEmail,
+  IsEnum,
   IsOptional,
   IsString,
   IsUrl,
@@ -18,6 +19,7 @@ export class RegisterDto {
 
   @IsString()
   @IsOptional()
+  @IsEnum(Role)
   role?: Role;
 
   @IsOptional()
