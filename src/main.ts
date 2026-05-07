@@ -16,11 +16,17 @@ async function bootstrap() {
   const uploadsPath = join(process.cwd(), 'uploads');
   const avatarsPath = join(uploadsPath, 'avatars');
 
+  app.enableCors({
+    origin: ['http://localhost:3000'],
+    credentials: true,
+  });
+
   if (!existsSync(avatarsPath)) {
     mkdirSync(avatarsPath, { recursive: true });
   }
 
   app.use('/uploads', express.static(uploadsPath));
+  app.use('/api/payments/webhook', express.raw({ type: 'application/json' }));
 
   app.setGlobalPrefix('api');
   app.useGlobalPipes(
@@ -37,7 +43,9 @@ async function bootstrap() {
 
   const config = new DocumentBuilder()
     .setTitle('Multi-vendor Marketplace API')
-    .setDescription('API documentation for the multi-vendor marketplace backend')
+    .setDescription(
+      'API documentation for the multi-vendor marketplace backend',
+    )
     .setVersion('1.0')
     .addBearerAuth(
       {

@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service';
 import { RegisterDto } from './dto/register.dto';
@@ -17,7 +21,9 @@ export class AuthService {
 
   async register(dto: RegisterDto) {
     if (dto.role && ![Role.CUSTOMER, Role.VENDOR].includes(dto.role)) {
-      throw new BadRequestException('Only CUSTOMER or VENDOR roles are allowed');
+      throw new BadRequestException(
+        'Only CUSTOMER or VENDOR roles are allowed',
+      );
     }
 
     const existingUser = await this.prisma.user.findUnique({

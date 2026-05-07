@@ -282,6 +282,63 @@ export class OrderService {
     });
   }
 
+  async confirmOrderForPayment(orderId: string) {
+    const order = await this.prisma.order.findUnique({
+      where: { id: orderId },
+      include: this.orderInclude,
+    });
+
+    if (!order) {
+      throw new NotFoundException('Order not found');
+    }
+
+    if (order.status !== OrderStatus.PENDING) {
+      return order;
+    }
+
+    return this.prisma.order.update({
+      where: { id: orderId },
+      data: { status: OrderStatus.CONFIRMED },
+      include: this.orderInclude,
+    });
+  }
+
+  async cancelOrderForPayment(orderId: string) {
+    const order = await this.prisma.order.findUnique({
+      where: { id: orderId },
+      include: {
+        items: true,
+      },
+    });
+
+    if (!order) {
+      throw new NotFoundException('Order not found');
+    }
+
+    if (order.status !== OrderStatus.PENDING) {
+      return order;
+    }
+
+    return this.prisma.$transaction(async (tx) => {
+      for (const item of order.items) {
+        await tx.product.update({
+          where: { id: item.productId },
+          data: {
+            stock: {
+              increment: item.quantity,
+            },
+          },
+        });
+      }
+
+      return tx.order.update({
+        where: { id: orderId },
+        data: { status: OrderStatus.CANCELLED },
+        include: this.orderInclude,
+      });
+    });
+  }
+
   private async ensureOrderExists(orderId: string) {
     const order = await this.prisma.order.findUnique({
       where: { id: orderId },

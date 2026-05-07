@@ -13,7 +13,10 @@ export class VendorMeResponseDto {
   @ApiProperty({ example: 'vendor@example.com' })
   email: string;
 
-  @ApiProperty({ example: 'VENDOR', enum: ['GUEST', 'CUSTOMER', 'VENDOR', 'ADMIN'] })
+  @ApiProperty({
+    example: 'VENDOR',
+    enum: ['GUEST', 'CUSTOMER', 'VENDOR', 'ADMIN'],
+  })
   role: string;
 
   @ApiProperty({ example: true })

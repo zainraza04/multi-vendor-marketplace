@@ -90,6 +90,33 @@ The API uses the `/api` prefix. Highlights for vendor/store functionality:
 - **AI (public)**
   - `POST /api/ai/chat` — basic chatbot reply (Gemini)
 
+## Stripe payments (new)
+
+The backend now supports Stripe Checkout via:
+
+- `POST /api/payments/checkout` — creates a Stripe Checkout session (customer)
+- `POST /api/payments/webhook` — Stripe webhook endpoint
+
+### Required environment variables
+
+Copy `.env.example` to `.env` and fill in:
+
+- `STRIPE_SECRET_KEY`
+- `STRIPE_WEBHOOK_SECRET`
+- `FRONTEND_URL`
+- `STRIPE_CURRENCY` (optional, defaults to `usd`)
+
+### Local webhook testing (recommended)
+
+Use the Stripe CLI to forward webhooks to your local server:
+
+```bash
+stripe login
+stripe listen --forward-to http://localhost:4000/api/payments/webhook
+```
+
+Then copy the printed webhook signing secret into `STRIPE_WEBHOOK_SECRET`.
+
 ## Project setup
 
 ```bash

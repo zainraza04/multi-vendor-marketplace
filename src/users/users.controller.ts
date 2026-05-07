@@ -66,7 +66,7 @@ export class UsersController {
   ) {
     if (!UsersController.allowedMimeTypes.includes(file.mimetype)) {
       cb(
-        new BadRequestException('Only JPG, PNG, and WEBP files are allowed') as unknown as Error,
+        new BadRequestException('Only JPG, PNG, and WEBP files are allowed'),
         false,
       );
       return;
@@ -127,7 +127,8 @@ export class UsersController {
   uploadMyProfilePicture(
     @CurrentUser('sub') userId: string,
     @UploadedFile() file: { filename: string } | undefined,
-    @Req() request: { protocol: string; get: (header: string) => string | undefined },
+    @Req()
+    request: { protocol: string; get: (header: string) => string | undefined },
   ) {
     if (!file) {
       throw new BadRequestException('Profile picture file is required');
@@ -136,7 +137,9 @@ export class UsersController {
     const host = request.get('host');
 
     if (!host) {
-      throw new BadRequestException('Could not resolve request host for profile picture URL');
+      throw new BadRequestException(
+        'Could not resolve request host for profile picture URL',
+      );
     }
 
     const avatarUrl = `${request.protocol}://${host}/uploads/avatars/${file.filename}`;

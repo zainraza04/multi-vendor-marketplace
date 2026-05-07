@@ -9,10 +9,7 @@ export class ErrorResponseDto {
 
   @ApiProperty({
     example: 'Validation failed',
-    oneOf: [
-      { type: 'string' },
-      { type: 'array', items: { type: 'string' } },
-    ],
+    oneOf: [{ type: 'string' }, { type: 'array', items: { type: 'string' } }],
   })
   message: string | string[];
 }

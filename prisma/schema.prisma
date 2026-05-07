@@ -26,6 +26,13 @@ enum OrderStatus {
   CANCELLED
 }
 
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  EXPIRED
+}
+
 enum ProductStatus {
   DRAFT
   ACTIVE
@@ -134,6 +141,7 @@ model Order {
 
   customer    User        @relation(fields: [customerId], references: [id])
   items       OrderItem[]
+  payment     Payment?
 
   @@map("orders")
 }
@@ -149,6 +157,22 @@ model OrderItem {
   product   Product @relation(fields: [productId], references: [id])
 
   @@map("order_items")
+}
+
+model Payment {
+  id                   String        @id @default(uuid())
+  orderId              String        @unique
+  amount               Decimal       @db.Decimal(10, 2)
+  currency             String        @default("usd")
+  status               PaymentStatus @default(PENDING)
+  stripeSessionId      String        @unique
+  stripePaymentIntentId String?      @unique
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
+
+  order                Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@map("payments")
 }
 
 model Cart {

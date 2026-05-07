@@ -48,21 +48,29 @@ describe('CustomerService', () => {
   });
 
   it('should upsert profile for existing customer', async () => {
-    prisma.user.findUnique.mockResolvedValueOnce({ id: 'customer-1', isActive: true });
+    prisma.user.findUnique.mockResolvedValueOnce({
+      id: 'customer-1',
+      isActive: true,
+    });
     prisma.profile.upsert.mockResolvedValueOnce({
       id: 'profile-1',
       userId: 'customer-1',
       firstName: 'Zain',
     });
 
-    const result = await service.updateProfile('customer-1', { firstName: 'Zain' });
+    const result = await service.updateProfile('customer-1', {
+      firstName: 'Zain',
+    });
 
     expect(prisma.profile.upsert).toHaveBeenCalled();
     expect(result).toMatchObject({ id: 'profile-1', firstName: 'Zain' });
   });
 
   it('should return cart totals when cart exists', async () => {
-    prisma.user.findUnique.mockResolvedValueOnce({ id: 'customer-1', isActive: true });
+    prisma.user.findUnique.mockResolvedValueOnce({
+      id: 'customer-1',
+      isActive: true,
+    });
     prisma.cart.findUnique.mockResolvedValueOnce({
       id: 'cart-1',
       items: [
@@ -80,8 +88,8 @@ describe('CustomerService', () => {
   it('should throw if order does not belong to customer', async () => {
     prisma.order.findFirst.mockResolvedValueOnce(null);
 
-    await expect(service.getOrderById('customer-1', 'order-1')).rejects.toBeInstanceOf(
-      NotFoundException,
-    );
+    await expect(
+      service.getOrderById('customer-1', 'order-1'),
+    ).rejects.toBeInstanceOf(NotFoundException);
   });
 });

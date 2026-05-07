@@ -13,7 +13,10 @@ export class CustomerMeResponseDto {
   @ApiProperty({ example: 'user@example.com' })
   email: string;
 
-  @ApiProperty({ example: 'CUSTOMER', enum: ['GUEST', 'CUSTOMER', 'VENDOR', 'ADMIN'] })
+  @ApiProperty({
+    example: 'CUSTOMER',
+    enum: ['GUEST', 'CUSTOMER', 'VENDOR', 'ADMIN'],
+  })
   role: string;
 
   @ApiProperty({ example: true })
@@ -118,7 +121,10 @@ export class CustomerOrderResponseDto {
   @ApiProperty({ example: 'f8ae1a45-49da-4f37-9728-1b9c47c4aee1' })
   id: string;
 
-  @ApiProperty({ example: 'PENDING', enum: ['PENDING', 'CONFIRMED', 'SHIPPED', 'DELIVERED', 'CANCELLED'] })
+  @ApiProperty({
+    example: 'PENDING',
+    enum: ['PENDING', 'CONFIRMED', 'SHIPPED', 'DELIVERED', 'CANCELLED'],
+  })
   status: string;
 
   @ApiProperty({ example: 199.98 })

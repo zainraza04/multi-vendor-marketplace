@@ -57,10 +57,7 @@ export class StoreController {
   @ApiOkResponse({ type: StoreResponseDto })
   @ApiBadRequestResponse({ type: ErrorResponseDto })
   @ApiUnauthorizedResponse({ type: ErrorResponseDto })
-  createStore(
-    @CurrentUser('sub') userId: string,
-    @Body() dto: CreateStoreDto,
-  ) {
+  createStore(@CurrentUser('sub') userId: string, @Body() dto: CreateStoreDto) {
     return this.storeService.create(userId, dto);
   }
 

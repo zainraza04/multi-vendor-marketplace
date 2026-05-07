@@ -90,7 +90,10 @@ export class CustomerController {
     schema: {
       type: 'object',
       properties: {
-        message: { type: 'string', example: 'Customer account deactivated successfully' },
+        message: {
+          type: 'string',
+          example: 'Customer account deactivated successfully',
+        },
       },
     },
   })

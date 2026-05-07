@@ -13,7 +13,9 @@ export class ProfileResponseDto {
   @ApiPropertyOptional({ example: '+923001234567' })
   phone?: string | null;
 
-  @ApiPropertyOptional({ example: 'https://example.com/uploads/avatars/avatar.jpg' })
+  @ApiPropertyOptional({
+    example: 'https://example.com/uploads/avatars/avatar.jpg',
+  })
   avatarUrl?: string | null;
 
   @ApiProperty({ example: '2026-04-29T12:00:00.000Z' })
@@ -30,7 +32,10 @@ export class UserResponseDto {
   @ApiProperty({ example: 'user@example.com' })
   email: string;
 
-  @ApiProperty({ example: 'CUSTOMER', enum: ['GUEST', 'CUSTOMER', 'VENDOR', 'ADMIN'] })
+  @ApiProperty({
+    example: 'CUSTOMER',
+    enum: ['GUEST', 'CUSTOMER', 'VENDOR', 'ADMIN'],
+  })
   role: string;
 
   @ApiProperty({ example: true })

@@ -12,6 +12,7 @@ import { ProductModule } from './product/product.module';
 import { CategoryModule } from './category/category.module';
 import { OrderModule } from './order/order.module';
 import { AiModule } from './ai/ai.module';
+import { PaymentsModule } from './payments/payments.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { AiModule } from './ai/ai.module';
     CategoryModule,
     OrderModule,
     AiModule,
+    PaymentsModule,
   ],
   controllers: [],
   providers: [],
