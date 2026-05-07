@@ -53,6 +53,13 @@ The API uses the `/api` prefix. Highlights for vendor/store functionality:
   - `PATCH /api/products/:productId` — update product (vendor owner)
   - `DELETE /api/products/:productId` — delete product (vendor owner)
 
+- **Cart (customer)**
+  - `GET /api/cart` — get current cart summary
+  - `POST /api/cart/items` — add item to cart
+  - `PATCH /api/cart/items/:productId` — update item quantity
+  - `DELETE /api/cart/items/:productId` — remove item from cart
+  - `DELETE /api/cart/clear` — clear cart
+
 - **Categories (public + admin)**
   - `GET /api/categories` — list categories
   - `GET /api/categories/:categoryId` — get category by id
