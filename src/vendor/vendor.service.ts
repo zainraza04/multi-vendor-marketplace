@@ -4,6 +4,7 @@ import { UpdateVendorProfileDto } from './dto/update-vendor-profile.dto';
 import { CreateStoreDto } from '../store/dto/create-store.dto';
 import { UpdateStoreDto } from '../store/dto/update-store.dto';
 import { StoreService } from '../store/store.service';
+import { PaginationQueryDto } from '../common/dto/pagination.dto';
 
 @Injectable()
 export class VendorService {
@@ -65,10 +66,10 @@ export class VendorService {
     });
   }
 
-  async getStores(userId: string) {
+  async getStores(userId: string, query?: PaginationQueryDto) {
     await this.ensureVendorExists(userId);
 
-    return this.storeService.findByOwner(userId);
+    return this.storeService.findByOwner(userId, query);
   }
 
   async getStoreById(userId: string, storeId: string) {

@@ -4,6 +4,11 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { PaginationQueryDto } from '../common/dto/pagination.dto';
+import {
+  buildPaginationMeta,
+  getPaginationParams,
+} from '../common/utils/pagination';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 
@@ -11,10 +16,22 @@ import { UpdateCategoryDto } from './dto/update-category.dto';
 export class CategoryService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findAll() {
-    return this.prisma.category.findMany({
-      orderBy: { name: 'asc' },
-    });
+  async findAll(query?: PaginationQueryDto) {
+    const { page, limit, skip, take } = getPaginationParams(query);
+
+    const [total, data] = await this.prisma.$transaction([
+      this.prisma.category.count(),
+      this.prisma.category.findMany({
+        orderBy: { name: 'asc' },
+        skip,
+        take,
+      }),
+    ]);
+
+    return {
+      data,
+      meta: buildPaginationMeta(total, page, limit),
+    };
   }
 
   async findOne(categoryId: string) {

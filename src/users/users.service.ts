@@ -7,6 +7,11 @@ import { User } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { PaginationQueryDto } from '../common/dto/pagination.dto';
+import {
+  buildPaginationMeta,
+  getPaginationParams,
+} from '../common/utils/pagination';
 
 @Injectable()
 export class UsersService {
@@ -17,15 +22,25 @@ export class UsersService {
     return safeUser;
   }
 
-  async findAll() {
-    const users = await this.prisma.user.findMany({
-      orderBy: { createdAt: 'desc' },
-      include: {
-        profile: true,
-      },
-    });
+  async findAll(query?: PaginationQueryDto) {
+    const { page, limit, skip, take } = getPaginationParams(query);
 
-    return users.map((user) => this.sanitizeUser(user));
+    const [total, users] = await this.prisma.$transaction([
+      this.prisma.user.count(),
+      this.prisma.user.findMany({
+        orderBy: { createdAt: 'desc' },
+        include: {
+          profile: true,
+        },
+        skip,
+        take,
+      }),
+    ]);
+
+    return {
+      data: users.map((user) => this.sanitizeUser(user)),
+      meta: buildPaginationMeta(total, page, limit),
+    };
   }
 
   async findMe(userId: string) {

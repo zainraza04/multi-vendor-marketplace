@@ -1,6 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ProductStatus, Role } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { PaginationQueryDto } from '../common/dto/pagination.dto';
+import {
+  buildPaginationMeta,
+  getPaginationParams,
+} from '../common/utils/pagination';
 
 @Injectable()
 export class AdminService {
@@ -29,13 +34,25 @@ export class AdminService {
     };
   }
 
-  async listUsers() {
-    return this.prisma.user.findMany({
-      orderBy: { createdAt: 'desc' },
-      include: {
-        profile: true,
-      },
-    });
+  async listUsers(query?: PaginationQueryDto) {
+    const { page, limit, skip, take } = getPaginationParams(query);
+
+    const [total, data] = await this.prisma.$transaction([
+      this.prisma.user.count(),
+      this.prisma.user.findMany({
+        orderBy: { createdAt: 'desc' },
+        include: {
+          profile: true,
+        },
+        skip,
+        take,
+      }),
+    ]);
+
+    return {
+      data,
+      meta: buildPaginationMeta(total, page, limit),
+    };
   }
 
   async updateUserRole(userId: string, role: Role) {
@@ -58,10 +75,22 @@ export class AdminService {
     });
   }
 
-  async listStores() {
-    return this.prisma.store.findMany({
-      orderBy: { createdAt: 'desc' },
-    });
+  async listStores(query?: PaginationQueryDto) {
+    const { page, limit, skip, take } = getPaginationParams(query);
+
+    const [total, data] = await this.prisma.$transaction([
+      this.prisma.store.count(),
+      this.prisma.store.findMany({
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take,
+      }),
+    ]);
+
+    return {
+      data,
+      meta: buildPaginationMeta(total, page, limit),
+    };
   }
 
   async verifyStore(storeId: string, isVerified: boolean) {
@@ -73,26 +102,38 @@ export class AdminService {
     });
   }
 
-  async listProducts() {
-    return this.prisma.product.findMany({
-      orderBy: { createdAt: 'desc' },
-      include: {
-        store: {
-          select: {
-            id: true,
-            name: true,
-            logoUrl: true,
+  async listProducts(query?: PaginationQueryDto) {
+    const { page, limit, skip, take } = getPaginationParams(query);
+
+    const [total, data] = await this.prisma.$transaction([
+      this.prisma.product.count(),
+      this.prisma.product.findMany({
+        orderBy: { createdAt: 'desc' },
+        include: {
+          store: {
+            select: {
+              id: true,
+              name: true,
+              logoUrl: true,
+            },
+          },
+          category: {
+            select: {
+              id: true,
+              name: true,
+              slug: true,
+            },
           },
         },
-        category: {
-          select: {
-            id: true,
-            name: true,
-            slug: true,
-          },
-        },
-      },
-    });
+        skip,
+        take,
+      }),
+    ]);
+
+    return {
+      data,
+      meta: buildPaginationMeta(total, page, limit),
+    };
   }
 
   async updateProductStatus(productId: string, status: ProductStatus) {

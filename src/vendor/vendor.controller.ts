@@ -9,6 +9,7 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
@@ -22,8 +23,10 @@ import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { Roles } from '../common/decorators/roles.decorator';
 import { Role } from '../common/enums/roles.enum';
 import { ErrorResponseDto } from '../common/swagger/error-response.dto';
+import { PaginationQueryDto } from '../common/dto/pagination.dto';
 import { ProfileResponseDto } from '../common/swagger/user-response.dto';
 import { StoreResponseDto } from '../common/swagger/store-response.dto';
+import { PaginatedStoreResponseDto } from '../common/swagger/pagination-response.dto';
 import { VendorMeResponseDto } from '../common/swagger/vendor-response.dto';
 import { CreateStoreDto } from '../store/dto/create-store.dto';
 import { UpdateStoreDto } from '../store/dto/update-store.dto';
@@ -59,10 +62,13 @@ export class VendorController {
 
   @Get('stores')
   @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: [StoreResponseDto] })
+  @ApiOkResponse({ type: PaginatedStoreResponseDto })
   @ApiUnauthorizedResponse({ type: ErrorResponseDto })
-  getStores(@CurrentUser('sub') userId: string) {
-    return this.vendorService.getStores(userId);
+  getStores(
+    @CurrentUser('sub') userId: string,
+    @Query() query: PaginationQueryDto,
+  ) {
+    return this.vendorService.getStores(userId, query);
   }
 
   @Get('stores/:storeId')

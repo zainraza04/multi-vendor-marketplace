@@ -8,6 +8,7 @@ import {
   Patch,
   Post,
   Body,
+  Query,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
@@ -22,6 +23,8 @@ import { Roles } from '../common/decorators/roles.decorator';
 import { Role } from '../common/enums/roles.enum';
 import { ErrorResponseDto } from '../common/swagger/error-response.dto';
 import { OrderResponseDto } from '../common/swagger/order-response.dto';
+import { PaginationQueryDto } from '../common/dto/pagination.dto';
+import { PaginatedOrderResponseDto } from '../common/swagger/pagination-response.dto';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 import { OrderService } from './order.service';
 
@@ -44,10 +47,13 @@ export class OrderController {
   @Get()
   @Roles(Role.CUSTOMER)
   @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: [OrderResponseDto] })
+  @ApiOkResponse({ type: PaginatedOrderResponseDto })
   @ApiUnauthorizedResponse({ type: ErrorResponseDto })
-  getMyOrders(@CurrentUser('sub') customerId: string) {
-    return this.orderService.findCustomerOrders(customerId);
+  getMyOrders(
+    @CurrentUser('sub') customerId: string,
+    @Query() query: PaginationQueryDto,
+  ) {
+    return this.orderService.findCustomerOrders(customerId, query);
   }
 
   @Get(':orderId')
@@ -80,10 +86,13 @@ export class OrderController {
   @Get('vendor')
   @Roles(Role.VENDOR)
   @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: [OrderResponseDto] })
+  @ApiOkResponse({ type: PaginatedOrderResponseDto })
   @ApiUnauthorizedResponse({ type: ErrorResponseDto })
-  getVendorOrders(@CurrentUser('sub') vendorId: string) {
-    return this.orderService.findVendorOrders(vendorId);
+  getVendorOrders(
+    @CurrentUser('sub') vendorId: string,
+    @Query() query: PaginationQueryDto,
+  ) {
+    return this.orderService.findVendorOrders(vendorId, query);
   }
 
   @Patch('vendor/:orderId/ship')
@@ -103,10 +112,10 @@ export class OrderController {
   @Get('admin')
   @Roles(Role.ADMIN)
   @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: [OrderResponseDto] })
+  @ApiOkResponse({ type: PaginatedOrderResponseDto })
   @ApiUnauthorizedResponse({ type: ErrorResponseDto })
-  getAllOrders() {
-    return this.orderService.listAllOrders();
+  getAllOrders(@Query() query: PaginationQueryDto) {
+    return this.orderService.listAllOrders(query);
   }
 
   @Patch('admin/:orderId/status')

@@ -1,5 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { PaginationQueryDto } from '../common/dto/pagination.dto';
+import {
+  buildPaginationMeta,
+  getPaginationParams,
+} from '../common/utils/pagination';
 import { UpdateCustomerProfileDto } from './dto/update-customer-profile.dto';
 
 @Injectable()
@@ -55,28 +60,40 @@ export class CustomerService {
     });
   }
 
-  async getOrders(userId: string) {
+  async getOrders(userId: string, query?: PaginationQueryDto) {
     await this.ensureCustomerExists(userId);
+    const { page, limit, skip, take } = getPaginationParams(query);
+    const where = { customerId: userId };
 
-    return this.prisma.order.findMany({
-      where: { customerId: userId },
-      orderBy: { createdAt: 'desc' },
-      include: {
-        items: {
-          include: {
-            product: {
-              select: {
-                id: true,
-                name: true,
-                imageUrl: true,
-                price: true,
-                status: true,
+    const [total, data] = await this.prisma.$transaction([
+      this.prisma.order.count({ where }),
+      this.prisma.order.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        include: {
+          items: {
+            include: {
+              product: {
+                select: {
+                  id: true,
+                  name: true,
+                  imageUrl: true,
+                  price: true,
+                  status: true,
+                },
               },
             },
           },
         },
-      },
-    });
+        skip,
+        take,
+      }),
+    ]);
+
+    return {
+      data,
+      meta: buildPaginationMeta(total, page, limit),
+    };
   }
 
   async getOrderById(userId: string, orderId: string) {

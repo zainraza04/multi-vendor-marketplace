@@ -7,6 +7,7 @@ import {
   Param,
   ParseUUIDPipe,
   Patch,
+  Query,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
@@ -26,6 +27,8 @@ import {
   CustomerMeResponseDto,
   CustomerOrderResponseDto,
 } from '../common/swagger/customer-response.dto';
+import { PaginationQueryDto } from '../common/dto/pagination.dto';
+import { PaginatedCustomerOrderResponseDto } from '../common/swagger/pagination-response.dto';
 import { ProfileResponseDto } from '../common/swagger/user-response.dto';
 import { ErrorResponseDto } from '../common/swagger/error-response.dto';
 
@@ -58,10 +61,13 @@ export class CustomerController {
 
   @Get('orders')
   @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: [CustomerOrderResponseDto] })
+  @ApiOkResponse({ type: PaginatedCustomerOrderResponseDto })
   @ApiUnauthorizedResponse({ type: ErrorResponseDto })
-  getOrders(@CurrentUser('sub') userId: string) {
-    return this.customerService.getOrders(userId);
+  getOrders(
+    @CurrentUser('sub') userId: string,
+    @Query() query: PaginationQueryDto,
+  ) {
+    return this.customerService.getOrders(userId, query);
   }
 
   @Get('orders/:orderId')

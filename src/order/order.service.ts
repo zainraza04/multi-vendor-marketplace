@@ -5,6 +5,11 @@ import {
 } from '@nestjs/common';
 import { OrderStatus, ProductStatus, Role } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { PaginationQueryDto } from '../common/dto/pagination.dto';
+import {
+  buildPaginationMeta,
+  getPaginationParams,
+} from '../common/utils/pagination';
 
 @Injectable()
 export class OrderService {
@@ -118,14 +123,26 @@ export class OrderService {
     return order;
   }
 
-  async findCustomerOrders(customerId: string) {
+  async findCustomerOrders(customerId: string, query?: PaginationQueryDto) {
     await this.ensureCustomerActive(customerId);
+    const { page, limit, skip, take } = getPaginationParams(query);
+    const where = { customerId };
 
-    return this.prisma.order.findMany({
-      where: { customerId },
-      orderBy: { createdAt: 'desc' },
-      include: this.orderInclude,
-    });
+    const [total, data] = await this.prisma.$transaction([
+      this.prisma.order.count({ where }),
+      this.prisma.order.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        include: this.orderInclude,
+        skip,
+        take,
+      }),
+    ]);
+
+    return {
+      data,
+      meta: buildPaginationMeta(total, page, limit),
+    };
   }
 
   async findCustomerOrderById(customerId: string, orderId: string) {
@@ -177,36 +194,48 @@ export class OrderService {
     });
   }
 
-  async findVendorOrders(vendorId: string) {
+  async findVendorOrders(vendorId: string, query?: PaginationQueryDto) {
     await this.ensureVendorActive(vendorId);
+    const { page, limit, skip, take } = getPaginationParams(query);
+    const where = {
+      items: {
+        some: {
+          product: {
+            store: {
+              ownerId: vendorId,
+            },
+          },
+        },
+      },
+    };
 
-    return this.prisma.order.findMany({
-      where: {
-        items: {
-          some: {
-            product: {
-              store: {
-                ownerId: vendorId,
+    const [total, data] = await this.prisma.$transaction([
+      this.prisma.order.count({ where }),
+      this.prisma.order.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        include: {
+          ...this.orderInclude,
+          items: {
+            where: {
+              product: {
+                store: {
+                  ownerId: vendorId,
+                },
               },
             },
+            include: this.orderInclude.items.include,
           },
         },
-      },
-      orderBy: { createdAt: 'desc' },
-      include: {
-        ...this.orderInclude,
-        items: {
-          where: {
-            product: {
-              store: {
-                ownerId: vendorId,
-              },
-            },
-          },
-          include: this.orderInclude.items.include,
-        },
-      },
-    });
+        skip,
+        take,
+      }),
+    ]);
+
+    return {
+      data,
+      meta: buildPaginationMeta(total, page, limit),
+    };
   }
 
   async shipOrder(vendorId: string, orderId: string) {
@@ -265,11 +294,23 @@ export class OrderService {
     });
   }
 
-  async listAllOrders() {
-    return this.prisma.order.findMany({
-      orderBy: { createdAt: 'desc' },
-      include: this.orderInclude,
-    });
+  async listAllOrders(query?: PaginationQueryDto) {
+    const { page, limit, skip, take } = getPaginationParams(query);
+
+    const [total, data] = await this.prisma.$transaction([
+      this.prisma.order.count(),
+      this.prisma.order.findMany({
+        orderBy: { createdAt: 'desc' },
+        include: this.orderInclude,
+        skip,
+        take,
+      }),
+    ]);
+
+    return {
+      data,
+      meta: buildPaginationMeta(total, page, limit),
+    };
   }
 
   async updateOrderStatus(orderId: string, status: OrderStatus) {

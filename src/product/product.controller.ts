@@ -24,6 +24,8 @@ import { Public } from '../common/decorators/public.decorator';
 import { Roles } from '../common/decorators/roles.decorator';
 import { Role } from '../common/enums/roles.enum';
 import { ErrorResponseDto } from '../common/swagger/error-response.dto';
+import { PaginationQueryDto } from '../common/dto/pagination.dto';
+import { PaginatedProductResponseDto } from '../common/swagger/pagination-response.dto';
 import { ProductResponseDto } from '../common/swagger/product-response.dto';
 import { CreateProductDto } from './dto/create-product.dto';
 import { ProductQueryDto } from './dto/product-query.dto';
@@ -39,7 +41,7 @@ export class ProductController {
   @Get()
   @Public()
   @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: [ProductResponseDto] })
+  @ApiOkResponse({ type: PaginatedProductResponseDto })
   getProducts(@Query() query: ProductQueryDto) {
     return this.productService.findAll(query);
   }
@@ -56,10 +58,13 @@ export class ProductController {
   @Get('me/list')
   @Roles(Role.VENDOR)
   @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: [ProductResponseDto] })
+  @ApiOkResponse({ type: PaginatedProductResponseDto })
   @ApiUnauthorizedResponse({ type: ErrorResponseDto })
-  getMyProducts(@CurrentUser('sub') userId: string) {
-    return this.productService.findVendorProducts(userId);
+  getMyProducts(
+    @CurrentUser('sub') userId: string,
+    @Query() query: PaginationQueryDto,
+  ) {
+    return this.productService.findVendorProducts(userId, query);
   }
 
   @Post()

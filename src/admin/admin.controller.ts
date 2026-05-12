@@ -7,6 +7,7 @@ import {
   Param,
   ParseUUIDPipe,
   Patch,
+  Query,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
@@ -23,6 +24,12 @@ import { UserResponseDto } from '../common/swagger/user-response.dto';
 import { StoreResponseDto } from '../common/swagger/store-response.dto';
 import { ProductResponseDto } from '../common/swagger/product-response.dto';
 import { AdminSummaryResponseDto } from '../common/swagger/admin-response.dto';
+import { PaginationQueryDto } from '../common/dto/pagination.dto';
+import {
+  PaginatedProductResponseDto,
+  PaginatedStoreResponseDto,
+  PaginatedUserResponseDto,
+} from '../common/swagger/pagination-response.dto';
 import { AdminService } from './admin.service';
 import { UpdateUserRoleDto } from './dto/update-user-role.dto';
 import { UpdateUserStatusDto } from './dto/update-user-status.dto';
@@ -46,10 +53,10 @@ export class AdminController {
 
   @Get('users')
   @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: [UserResponseDto] })
+  @ApiOkResponse({ type: PaginatedUserResponseDto })
   @ApiUnauthorizedResponse({ type: ErrorResponseDto })
-  getUsers() {
-    return this.adminService.listUsers();
+  getUsers(@Query() query: PaginationQueryDto) {
+    return this.adminService.listUsers(query);
   }
 
   @Patch('users/:userId/role')
@@ -80,10 +87,10 @@ export class AdminController {
 
   @Get('stores')
   @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: [StoreResponseDto] })
+  @ApiOkResponse({ type: PaginatedStoreResponseDto })
   @ApiUnauthorizedResponse({ type: ErrorResponseDto })
-  getStores() {
-    return this.adminService.listStores();
+  getStores(@Query() query: PaginationQueryDto) {
+    return this.adminService.listStores(query);
   }
 
   @Patch('stores/:storeId/verify')
@@ -101,10 +108,10 @@ export class AdminController {
 
   @Get('products')
   @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: [ProductResponseDto] })
+  @ApiOkResponse({ type: PaginatedProductResponseDto })
   @ApiUnauthorizedResponse({ type: ErrorResponseDto })
-  getProducts() {
-    return this.adminService.listProducts();
+  getProducts(@Query() query: PaginationQueryDto) {
+    return this.adminService.listProducts(query);
   }
 
   @Patch('products/:productId/status')

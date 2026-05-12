@@ -9,6 +9,7 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
@@ -23,6 +24,8 @@ import { Roles } from '../common/decorators/roles.decorator';
 import { Role } from '../common/enums/roles.enum';
 import { CategoryResponseDto } from '../common/swagger/category-response.dto';
 import { ErrorResponseDto } from '../common/swagger/error-response.dto';
+import { PaginationQueryDto } from '../common/dto/pagination.dto';
+import { PaginatedCategoryResponseDto } from '../common/swagger/pagination-response.dto';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { CategoryService } from './category.service';
@@ -36,9 +39,9 @@ export class CategoryController {
   @Get()
   @Public()
   @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: [CategoryResponseDto] })
-  getCategories() {
-    return this.categoryService.findAll();
+  @ApiOkResponse({ type: PaginatedCategoryResponseDto })
+  getCategories(@Query() query: PaginationQueryDto) {
+    return this.categoryService.findAll(query);
   }
 
   @Get(':categoryId')

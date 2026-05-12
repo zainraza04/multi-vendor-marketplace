@@ -4,6 +4,11 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { PaginationQueryDto } from '../common/dto/pagination.dto';
+import {
+  buildPaginationMeta,
+  getPaginationParams,
+} from '../common/utils/pagination';
 import { CreateStoreDto } from './dto/create-store.dto';
 import { UpdateStoreDto } from './dto/update-store.dto';
 
@@ -11,17 +16,41 @@ import { UpdateStoreDto } from './dto/update-store.dto';
 export class StoreService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findAll() {
-    return this.prisma.store.findMany({
-      orderBy: { createdAt: 'desc' },
-    });
+  async findAll(query?: PaginationQueryDto) {
+    const { page, limit, skip, take } = getPaginationParams(query);
+
+    const [total, data] = await this.prisma.$transaction([
+      this.prisma.store.count(),
+      this.prisma.store.findMany({
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take,
+      }),
+    ]);
+
+    return {
+      data,
+      meta: buildPaginationMeta(total, page, limit),
+    };
   }
 
-  async findByOwner(ownerId: string) {
-    return this.prisma.store.findMany({
-      where: { ownerId },
-      orderBy: { createdAt: 'desc' },
-    });
+  async findByOwner(ownerId: string, query?: PaginationQueryDto) {
+    const { page, limit, skip, take } = getPaginationParams(query);
+
+    const [total, data] = await this.prisma.$transaction([
+      this.prisma.store.count({ where: { ownerId } }),
+      this.prisma.store.findMany({
+        where: { ownerId },
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take,
+      }),
+    ]);
+
+    return {
+      data,
+      meta: buildPaginationMeta(total, page, limit),
+    };
   }
 
   async findOne(storeId: string) {

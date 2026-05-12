@@ -9,6 +9,7 @@ import {
   Param,
   ParseUUIDPipe,
   Patch,
+  Query,
   Req,
   UploadedFile,
   UseInterceptors,
@@ -37,6 +38,8 @@ import {
   UserResponseDto,
 } from '../common/swagger/user-response.dto';
 import { ErrorResponseDto } from '../common/swagger/error-response.dto';
+import { PaginationQueryDto } from '../common/dto/pagination.dto';
+import { PaginatedUserResponseDto } from '../common/swagger/pagination-response.dto';
 
 @Controller('users')
 @ApiTags('Users')
@@ -78,10 +81,10 @@ export class UsersController {
   @Get()
   @HttpCode(HttpStatus.OK)
   @Roles(Role.ADMIN)
-  @ApiOkResponse({ type: [UserResponseDto] })
+  @ApiOkResponse({ type: PaginatedUserResponseDto })
   @ApiUnauthorizedResponse({ type: ErrorResponseDto })
-  findAll() {
-    return this.usersService.findAll();
+  findAll(@Query() query: PaginationQueryDto) {
+    return this.usersService.findAll(query);
   }
 
   @Get('me')

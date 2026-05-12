@@ -6,6 +6,10 @@ import {
 import { ProductStatus } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { StoreService } from '../store/store.service';
+import {
+  buildPaginationMeta,
+  getPaginationParams,
+} from '../common/utils/pagination';
 import { CreateProductDto } from './dto/create-product.dto';
 import { ProductQueryDto } from './dto/product-query.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -60,11 +64,23 @@ export class ProductService {
         : {}),
     };
 
-    return this.prisma.product.findMany({
-      where,
-      orderBy: { createdAt: 'desc' },
-      select: this.productSelect,
-    });
+    const { page, limit, skip, take } = getPaginationParams(query);
+
+    const [total, data] = await this.prisma.$transaction([
+      this.prisma.product.count({ where }),
+      this.prisma.product.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        select: this.productSelect,
+        skip,
+        take,
+      }),
+    ]);
+
+    return {
+      data,
+      meta: buildPaginationMeta(total, page, limit),
+    };
   }
 
   async findOne(productId: string) {
@@ -83,16 +99,29 @@ export class ProductService {
     return product;
   }
 
-  async findVendorProducts(ownerId: string) {
-    return this.prisma.product.findMany({
-      where: {
-        store: {
-          ownerId,
-        },
+  async findVendorProducts(ownerId: string, query?: ProductQueryDto) {
+    const { page, limit, skip, take } = getPaginationParams(query);
+    const where = {
+      store: {
+        ownerId,
       },
-      orderBy: { createdAt: 'desc' },
-      select: this.productSelect,
-    });
+    };
+
+    const [total, data] = await this.prisma.$transaction([
+      this.prisma.product.count({ where }),
+      this.prisma.product.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        select: this.productSelect,
+        skip,
+        take,
+      }),
+    ]);
+
+    return {
+      data,
+      meta: buildPaginationMeta(total, page, limit),
+    };
   }
 
   async create(ownerId: string, dto: CreateProductDto) {

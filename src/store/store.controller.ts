@@ -9,6 +9,7 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
@@ -23,6 +24,8 @@ import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { Roles } from '../common/decorators/roles.decorator';
 import { Role } from '../common/enums/roles.enum';
 import { ErrorResponseDto } from '../common/swagger/error-response.dto';
+import { PaginationQueryDto } from '../common/dto/pagination.dto';
+import { PaginatedStoreResponseDto } from '../common/swagger/pagination-response.dto';
 import { StoreResponseDto } from '../common/swagger/store-response.dto';
 import { CreateStoreDto } from './dto/create-store.dto';
 import { UpdateStoreDto } from './dto/update-store.dto';
@@ -37,9 +40,9 @@ export class StoreController {
   @Get()
   @Public()
   @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: [StoreResponseDto] })
-  getStores() {
-    return this.storeService.findAll();
+  @ApiOkResponse({ type: PaginatedStoreResponseDto })
+  getStores(@Query() query: PaginationQueryDto) {
+    return this.storeService.findAll(query);
   }
 
   @Get(':storeId')
